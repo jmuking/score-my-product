@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ApiContext, defaultApiData } from "./api";
 import Modal, { defaultModalState, ModalContext } from "./components/modal";
 import ProductMap from "./components/productMap";
 import { UserState } from "./types";
@@ -18,6 +19,7 @@ export const UserContext = React.createContext(defaultUserContext);
 export default function Home() {
   const [modalState, setModalState] = useState(defaultModalState);
   const [userState, setUserState] = useState(defaultUserState);
+  const [apiData, setApiData] = useState(defaultApiData);
 
   const startLogin = () => {
     setModalState({
@@ -41,12 +43,14 @@ export default function Home() {
   return (
     <div className="size-full">
       <UserContext.Provider value={{ userState, setUserState }}>
-        <ModalContext.Provider
-          value={{ modalState, setModalState, startLogin }}
-        >
-          <ProductMap></ProductMap>
-          <Modal></Modal>
-        </ModalContext.Provider>
+        <ApiContext.Provider value={{ apiData, setApiData }}>
+          <ModalContext.Provider
+            value={{ modalState, setModalState, startLogin }}
+          >
+            <ProductMap></ProductMap>
+            <Modal></Modal>
+          </ModalContext.Provider>
+        </ApiContext.Provider>
       </UserContext.Provider>
     </div>
   );

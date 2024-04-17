@@ -1,3 +1,4 @@
+//Context Types
 export interface ModalState {
   open: boolean;
   title: string;
@@ -14,6 +15,13 @@ export interface UserState {
   userName?: string;
 }
 
+export interface ApiData {
+  product?: Product;
+  posts?: any[];
+  scores?: any[];
+}
+
+// Data Types
 export interface Post {
   country: string;
   product: string;
