@@ -14,7 +14,7 @@ import { useContext, useRef, useState } from "react";
 import { ApiContext, createPost, editPost, getPosts } from "../api";
 import { ModalContext } from "./modal";
 import { MapState, ModalType } from "../types";
-import { UserContext } from "../page";
+import { UserContext } from "./profile";
 import React from "react";
 
 const layerStyle: FillLayer = {

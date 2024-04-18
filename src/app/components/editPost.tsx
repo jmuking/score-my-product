@@ -9,9 +9,9 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { BaseSyntheticEvent } from "react";
 import { ApiContext, deletePost } from "../api";
-import { UserContext } from "../page";
 import { ModalType, Post } from "../types";
 import { defaultModalState, ModalContext } from "./modal";
+import { UserContext } from "./profile";
 
 interface PostData {
   score: number;

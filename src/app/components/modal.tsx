@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import React from "react";
-import { UserContext } from "../page";
+import { UserContext } from "./profile";
 import {
   Button,
   Dialog,

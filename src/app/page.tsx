@@ -5,16 +5,8 @@ import React, { useState } from "react";
 import { ApiContext, defaultApiData } from "./api";
 import Modal, { defaultModalState, ModalContext } from "./components/modal";
 import ProductMap from "./components/productMap";
-import { ModalType, UserState } from "./types";
-
-const defaultUserState: UserState = {
-  loggedIn: false,
-};
-export const defaultUserContext = {
-  userState: defaultUserState,
-  setUserState: (userState: UserState) => {},
-};
-export const UserContext = React.createContext(defaultUserContext);
+import { defaultUserState, UserContext } from "./components/profile";
+import { ModalType } from "./types";
 
 export default function Home() {
   const [modalState, setModalState] = useState(defaultModalState);

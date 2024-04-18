@@ -1,9 +1,18 @@
 import React from "react";
-import { UserContext } from "../page";
 import ProfileActions from "./profileActions";
 
 import { Button } from "@material-tailwind/react";
 import { ModalContext } from "./modal";
+import { UserState } from "../types";
+
+export const defaultUserState: UserState = {
+  loggedIn: false,
+};
+export const defaultUserContext = {
+  userState: defaultUserState,
+  setUserState: (userState: UserState) => {},
+};
+export const UserContext = React.createContext(defaultUserContext);
 
 export default function Profile() {
   const modalContext = React.useContext(ModalContext);
