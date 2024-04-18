@@ -9,8 +9,7 @@ import Map, {
 import type { FillLayer } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Profile from "./profile";
-import { MutableRefObject, useContext, useRef, useState } from "react";
-import { features } from "process";
+import { useContext, useRef, useState } from "react";
 import { ApiContext, createPost } from "../api";
 import { ModalContext } from "./modal";
 import { ModalType } from "../types";

@@ -1,4 +1,4 @@
-import { BaseSyntheticEvent, useEffect } from "react";
+import { useEffect } from "react";
 import React from "react";
 import { UserContext } from "../page";
 import {

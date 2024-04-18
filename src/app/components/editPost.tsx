@@ -1,6 +1,6 @@
-import { Input, Select, Slider } from "@material-tailwind/react";
+import { Input, Slider } from "@material-tailwind/react";
 import { useContext, useEffect } from "react";
-import { BaseSyntheticEvent, useState } from "react";
+import { BaseSyntheticEvent } from "react";
 import { lookupProduct } from "../data";
 import { ModalContext } from "./modal";
 
