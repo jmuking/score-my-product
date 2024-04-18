@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Select, Option } from "@material-tailwind/react";
-import { Product } from "../types";
 import { Products } from "../data";
 import { ApiContext, getScores } from "../api";
 
@@ -11,13 +10,18 @@ export default function ProfileActions() {
 
   const productChanged = (product: string) => {
     setActiveProduct(product);
+    apiContext.setApiData({ ...apiContext.apiData, product });
+
     getScores(product).then((value) => {
-      console.log(value);
+      console.log(value.scores);
     });
   };
 
   return (
-    <div className="mt-3">
+    <div className="mt-2">
+      <p className="mb-4 text-base">
+        Select a product, and then click on a country to get scoring.
+      </p>
       <Select
         label="Select Product"
         value={activeProduct}

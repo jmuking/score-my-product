@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { ApiContext, defaultApiData } from "./api";
 import Modal, { defaultModalState, ModalContext } from "./components/modal";
 import ProductMap from "./components/productMap";
-import { UserState } from "./types";
+import { ModalType, UserState } from "./types";
 
 const defaultUserState: UserState = {
   loggedIn: false,
@@ -26,9 +26,8 @@ export default function Home() {
       ...modalState,
       open: true,
       title: "Login",
-      text: "Please enter your username",
       confirmText: "Sign in",
-      askForInput: true,
+      modalType: ModalType.LOGIN,
       showCancel: false,
       confirmAction: (userName) => {
         setUserState({

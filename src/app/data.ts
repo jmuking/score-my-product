@@ -7,3 +7,9 @@ export const Products: Product[] = [
   { code: "004", label: "REDD Scoping Report" },
   { code: "005", label: "ARR Eligibility Fast" },
 ];
+
+export const lookupProduct = (productCode: string) => {
+  return Products.find((product) => {
+    return product.code === productCode;
+  });
+};

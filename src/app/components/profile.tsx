@@ -10,8 +10,8 @@ export default function Profile() {
   const userContext = React.useContext(UserContext);
 
   return (
-    <div className="absolute top-3 right-3 bg-white rounded p-4 text-xl">
-      <div className="flex justify-end">
+    <div className="absolute top-3 right-3 bg-white rounded p-4 text-xl w-64">
+      <div className="flex justify-end pb-3 border-b-2 border-slate-800 border-solid">
         {userContext.userState.userName ? (
           <p className="font-sans text-base">
             Logged in as: <b>{userContext.userState.userName}</b>

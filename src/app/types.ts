@@ -6,8 +6,15 @@ export interface ModalState {
   cancelText: string;
   confirmText: string;
   showCancel: boolean;
-  askForInput?: boolean;
+  modalType: ModalType;
+  inputData?: any;
   confirmAction?: (actionResult: any) => void;
+}
+
+export enum ModalType {
+  BASIC = "basic",
+  LOGIN = "login",
+  CREATE_POST = "create_post",
 }
 
 export interface UserState {
@@ -16,7 +23,7 @@ export interface UserState {
 }
 
 export interface ApiData {
-  product?: Product;
+  product?: string;
   posts?: any[];
   scores?: any[];
 }

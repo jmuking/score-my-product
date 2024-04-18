@@ -1,5 +1,6 @@
+import { randomUUID } from "crypto";
 import React from "react";
-import { ApiData, Product } from "./types";
+import { ApiData, Post, Product } from "./types";
 
 export const defaultApiData: ApiData = {};
 export const defaultApiContext = {
@@ -8,18 +9,40 @@ export const defaultApiContext = {
 };
 export const ApiContext = React.createContext(defaultApiContext);
 
+function uuidv4() {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
+    (
+      +c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))
+    ).toString(16)
+  );
+}
+
 const BASE_URL = "https://coverage-mapper-2rca5acexa-uc.a.run.app";
 const DEFAULT_DATA: any = {
   method: "GET",
   mode: "cors",
   withCredentials: true,
   headers: {
-    "X-API-Key": "Pp7GszmeMlnQXjLiKTpydva0pnSFIHOq",
+    "X-API-Key": process.env.X_API_KEY,
     "Access-Control-Allow-Origin": "*",
   },
 };
 
 //POST requests
+export const createPost = async (post: Post) => {
+  const body = { ...post, id: uuidv4() };
+  console.log(body);
+
+  const response = await fetch(`${BASE_URL}/posts`, {
+    ...DEFAULT_DATA,
+    method: "POST",
+    body,
+  });
+
+  return response.json();
+};
+
 export const getPosts = async (product: Product, country: string) => {
   const response = await fetch(
     `${BASE_URL}/posts?` +
@@ -35,7 +58,6 @@ export const getScores = async (product: string, country?: string) => {
   const searchParams = new URLSearchParams({ product });
   if (country) searchParams.append("country", country);
 
-  console.log(DEFAULT_DATA);
   const response = await fetch(
     `${BASE_URL}/scores?` + searchParams,
     DEFAULT_DATA
