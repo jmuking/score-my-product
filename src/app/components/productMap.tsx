@@ -13,8 +13,9 @@ import Profile from "./profile";
 import { useContext, useRef, useState } from "react";
 import { ApiContext, createPost, editPost, getPosts } from "../api";
 import { ModalContext } from "./modal";
-import { ModalType } from "../types";
+import { MapState, ModalType } from "../types";
 import { UserContext } from "../page";
+import React from "react";
 
 const layerStyle: FillLayer = {
   id: "countries",
@@ -34,6 +35,15 @@ const layerStyle: FillLayer = {
   },
 };
 
+const defaultMapState: MapState = {
+  mapRef: null,
+};
+export const defaultMapContext = {
+  mapState: defaultMapState,
+  setMapState: (mapState: MapState) => {},
+};
+export const MapContext = React.createContext(defaultMapContext);
+
 export default function ProductMap() {
   const mapRef = useRef<MapRef>(null);
 
@@ -41,7 +51,12 @@ export default function ProductMap() {
   const modalContext = useContext(ModalContext);
   const userContext = useContext(UserContext);
 
+  const [mapState, setMapState] = useState(defaultMapState);
   const [hovered, setHovered] = useState<string | number | undefined>();
+
+  const mapRender = () => {
+    setMapState({ ...mapState, ...{ mapRef } });
+  };
 
   const canEdit = (features: MapboxGeoJSONFeature[] | undefined) => {
     return features && features.length > 0 && apiContext.apiData.product;
@@ -86,8 +101,6 @@ export default function ProductMap() {
                   score,
                   comment,
                 };
-
-                console.log(data, id);
 
                 if (!id) {
                   createPost(payload);
@@ -136,29 +149,32 @@ export default function ProductMap() {
   };
 
   return (
-    <Map
-      ref={mapRef}
-      mapboxAccessToken={process.env.MAPBOX_API_KEY}
-      initialViewState={{
-        longitude: -98.5795,
-        latitude: 39.8283,
-        zoom: 2,
-      }}
-      mapStyle="mapbox://styles/mapbox/streets-v9"
-      interactiveLayerIds={["countries"]}
-      onClick={featureClick}
-      onMouseMove={mouseMove}
-    >
-      <Source
-        id="countries"
-        url="mapbox://mapbox.country-boundaries-v1"
-        type="vector"
+    <MapContext.Provider value={{ mapState, setMapState }}>
+      <Map
+        ref={mapRef}
+        mapboxAccessToken={process.env.MAPBOX_API_KEY}
+        initialViewState={{
+          longitude: -98.5795,
+          latitude: 39.8283,
+          zoom: 2,
+        }}
+        mapStyle="mapbox://styles/mapbox/streets-v9"
+        interactiveLayerIds={["countries"]}
+        onClick={featureClick}
+        onMouseMove={mouseMove}
+        onRender={mapRender}
       >
-        <Layer {...layerStyle}></Layer>
-      </Source>
-      <GeolocateControl position="top-left" />
-      <NavigationControl position="top-left" />
-      <Profile />
-    </Map>
+        <Source
+          id="countries"
+          url="mapbox://mapbox.country-boundaries-v1"
+          type="vector"
+        >
+          <Layer {...layerStyle}></Layer>
+        </Source>
+        <GeolocateControl position="top-left" />
+        <NavigationControl position="top-left" />
+        <Profile />
+      </Map>
+    </MapContext.Provider>
   );
 }

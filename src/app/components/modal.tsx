@@ -33,9 +33,7 @@ export default function Modal() {
   const modalContext = React.useContext(ModalContext);
   const userContext = React.useContext(UserContext);
 
-  const [data, setData] = React.useState<any>(
-    modalContext.modalState.inputData
-  );
+  const [data, setData] = React.useState<any>({});
 
   useEffect(() => {
     if (!userContext.userState.loggedIn) {

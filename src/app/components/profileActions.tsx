@@ -3,9 +3,11 @@ import { Select, Option } from "@material-tailwind/react";
 import { lookupProduct, Products } from "../data";
 import { ApiContext, getScores } from "../api";
 import { Product } from "../types";
+import { MapContext } from "./productMap";
 
 export default function ProfileActions() {
   const apiContext = React.useContext(ApiContext);
+  const mapContext = React.useContext(MapContext);
 
   const [activeProduct, setActiveProduct] = useState<Product>();
 

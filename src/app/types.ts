@@ -1,3 +1,6 @@
+import { RefObject } from "react";
+import { MapRef } from "react-map-gl";
+
 //Context Types
 export interface ModalState {
   open: boolean;
@@ -21,6 +24,10 @@ export enum ModalType {
 export interface UserState {
   loggedIn: boolean;
   userName?: string;
+}
+
+export interface MapState {
+  mapRef: RefObject<MapRef> | null;
 }
 
 export interface ApiData {

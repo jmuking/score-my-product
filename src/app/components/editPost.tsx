@@ -100,7 +100,7 @@ export default function EditPost({ data, setData }: EditPostParams) {
               <>
                 <Slider
                   className="mb-10"
-                  value={data?.score}
+                  defaultValue={data?.score}
                   min={0}
                   max={100}
                   step={1}
@@ -110,7 +110,7 @@ export default function EditPost({ data, setData }: EditPostParams) {
                 />
                 <Input
                   label="Please add any comments"
-                  value={data?.comment}
+                  defaultValue={data?.comment}
                   onChange={(event: BaseSyntheticEvent) => {
                     setData({ ...data, comment: event.target.value });
                   }}
