@@ -5,12 +5,13 @@ import Map, {
   Source,
   MapRef,
   MapboxGeoJSONFeature,
+  MapLayerMouseEvent,
 } from "react-map-gl";
 import type { FillLayer } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Profile from "./profile";
 import { useContext, useRef, useState } from "react";
-import { ApiContext, createPost } from "../api";
+import { ApiContext, createPost, editPost, getPosts } from "../api";
 import { ModalContext } from "./modal";
 import { ModalType } from "../types";
 import { UserContext } from "../page";
@@ -46,6 +47,94 @@ export default function ProductMap() {
     return features && features.length > 0 && apiContext.apiData.product;
   };
 
+  const featureClick = (evt: MapLayerMouseEvent) => {
+    const features = evt?.features;
+    if (features && canEdit(features)) {
+      const properties = features[0].properties;
+
+      const country = properties;
+      const user = userContext.userState.userName;
+      const product = apiContext.apiData.product;
+
+      if (product) {
+        apiContext.setApiLoading(true);
+        getPosts(product, country?.iso_3166_1_alpha_3).then((result) => {
+          apiContext.setApiData({
+            ...apiContext.apiData,
+            ...{ posts: result.posts },
+          });
+
+          apiContext.setApiLoading(false);
+
+          modalContext.setModalState({
+            ...modalContext.modalState,
+            open: true,
+            title: `${result.posts.length > 0 ? "Edit" : "Create"} post`,
+            modalType: ModalType.EDIT_POST,
+            showConfirm: result.posts.length === 0,
+            inputData: { country, product },
+            confirmAction: (data) => {
+              const score = data.score;
+              const comment = data.comment;
+              const id = data.id;
+
+              if (user && product) {
+                const payload = {
+                  country: country?.iso_3166_1_alpha_3,
+                  product: product?.code,
+                  user,
+                  score,
+                  comment,
+                };
+
+                console.log(data, id);
+
+                if (!id) {
+                  createPost(payload);
+                } else {
+                  editPost({ ...payload, ...{ id } });
+                }
+              }
+            },
+          });
+        });
+      }
+    }
+  };
+
+  const mouseMove = (evt: MapLayerMouseEvent) => {
+    const features = evt?.features;
+    if (features && mapRef?.current) {
+      mapRef.current.getCanvas().style.cursor = canEdit(features)
+        ? "pointer"
+        : "default";
+
+      if (hovered) {
+        mapRef.current.setFeatureState(
+          {
+            source: "countries",
+            sourceLayer: "country_boundaries",
+            id: hovered,
+          },
+          { hover: false }
+        );
+      }
+
+      if (features.length > 0) {
+        mapRef.current.setFeatureState(
+          {
+            source: "countries",
+            sourceLayer: "country_boundaries",
+            id: features[0].id,
+          },
+          { hover: true }
+        );
+
+        setHovered(features[0].id);
+      }
+    }
+  };
+
   return (
     <Map
       ref={mapRef}
@@ -57,70 +146,8 @@ export default function ProductMap() {
       }}
       mapStyle="mapbox://styles/mapbox/streets-v9"
       interactiveLayerIds={["countries"]}
-      onClick={(evt) => {
-        const features = evt?.features;
-        if (features && canEdit(features)) {
-          const properties = features[0].properties;
-
-          const country = properties;
-          const user = userContext.userState.userName;
-          const product = apiContext.apiData.product;
-
-          modalContext.setModalState({
-            ...modalContext.modalState,
-            open: true,
-            title: "Create post",
-            modalType: ModalType.CREATE_POST,
-            inputData: { country, product },
-            confirmAction: (data) => {
-              const score = data.score;
-              const comment = data.comment;
-
-              if (user && product) {
-                createPost({
-                  country: country?.wikidata_id,
-                  product: product?.code,
-                  user,
-                  score,
-                  comment,
-                });
-              }
-            },
-          });
-        }
-      }}
-      onMouseMove={(evt) => {
-        const features = evt?.features;
-        if (features && mapRef?.current) {
-          mapRef.current.getCanvas().style.cursor = canEdit(features)
-            ? "pointer"
-            : "default";
-
-          if (hovered) {
-            mapRef.current.setFeatureState(
-              {
-                source: "countries",
-                sourceLayer: "country_boundaries",
-                id: hovered,
-              },
-              { hover: false }
-            );
-          }
-
-          if (features.length > 0) {
-            mapRef.current.setFeatureState(
-              {
-                source: "countries",
-                sourceLayer: "country_boundaries",
-                id: features[0].id,
-              },
-              { hover: true }
-            );
-
-            setHovered(features[0].id);
-          }
-        }
-      }}
+      onClick={featureClick}
+      onMouseMove={mouseMove}
     >
       <Source
         id="countries"

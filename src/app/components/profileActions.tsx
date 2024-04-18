@@ -15,10 +15,18 @@ export default function ProfileActions() {
 
       if (product) {
         setActiveProduct(product);
-        apiContext.setApiData({ ...apiContext.apiData, product });
+        apiContext.setApiData({
+          ...apiContext.apiData,
+          ...{ product },
+        });
+        apiContext.setApiLoading(true);
 
         getScores(product).then((value) => {
-          console.log(value.scores);
+          apiContext.setApiData({
+            ...apiContext.apiData,
+            ...{ product, scores: value.scores },
+          });
+          apiContext.setApiLoading(false);
         });
       }
     }

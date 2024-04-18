@@ -3,6 +3,8 @@ import { ApiData, Post, Product } from "./types";
 
 export const defaultApiData: ApiData = {};
 export const defaultApiContext = {
+  apiLoading: false,
+  setApiLoading: (loading: boolean) => {},
   apiData: defaultApiData,
   setApiData: (apiData: ApiData) => {},
 };
@@ -25,17 +27,39 @@ const DEFAULT_DATA: any = {
   headers: {
     "X-API-Key": process.env.X_API_KEY,
     "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json",
   },
 };
 
 //POST requests
 export const createPost = async (post: Post) => {
-  const body = { ...post, id: uuidv4() };
+  const body = JSON.stringify({ ...post, id: uuidv4() });
 
   const response = await fetch(`${BASE_URL}/posts`, {
     ...DEFAULT_DATA,
     method: "POST",
     body,
+  });
+
+  return response.json();
+};
+
+export const editPost = async (post: Post) => {
+  const body = JSON.stringify({ score: post.score, comment: post.comment });
+
+  const response = await fetch(`${BASE_URL}/posts/${post.id}`, {
+    ...DEFAULT_DATA,
+    method: "PUT",
+    body,
+  });
+
+  return response.json();
+};
+
+export const deletePost = async (post: Post) => {
+  const response = await fetch(`${BASE_URL}/posts/${post.id}`, {
+    ...DEFAULT_DATA,
+    method: "DELETE",
   });
 
   return response.json();

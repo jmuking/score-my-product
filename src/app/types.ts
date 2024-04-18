@@ -6,6 +6,7 @@ export interface ModalState {
   cancelText: string;
   confirmText: string;
   showCancel: boolean;
+  showConfirm: boolean;
   modalType: ModalType;
   inputData?: any;
   confirmAction?: (actionResult: any) => void;
@@ -14,7 +15,7 @@ export interface ModalState {
 export enum ModalType {
   BASIC = "basic",
   LOGIN = "login",
-  CREATE_POST = "create_post",
+  EDIT_POST = "edit_post",
 }
 
 export interface UserState {
@@ -35,6 +36,7 @@ export interface Post {
   score: number;
   comment: string;
   user: string;
+  id?: string; // id if we get from API
 }
 
 export interface Product {

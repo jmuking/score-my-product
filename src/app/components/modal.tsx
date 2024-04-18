@@ -19,6 +19,7 @@ export const defaultModalState: ModalState = {
   cancelText: "Cancel",
   confirmText: "Confirm",
   showCancel: true,
+  showConfirm: true,
   modalType: ModalType.BASIC,
 };
 const defaultModalContext = {
@@ -64,7 +65,7 @@ export default function Modal() {
       >
         <DialogHeader>{modalContext.modalState.title}</DialogHeader>
         <DialogBody>
-          {modalContext.modalState.modalType === ModalType.CREATE_POST && (
+          {modalContext.modalState.modalType === ModalType.EDIT_POST && (
             <EditPost data={data} setData={setData} />
           )}
 
@@ -87,9 +88,11 @@ export default function Modal() {
               <span>{modalContext.modalState.cancelText}</span>
             </Button>
           )}
-          <Button variant="gradient" color="green" type="submit">
-            <span>{modalContext.modalState.confirmText}</span>
-          </Button>
+          {modalContext.modalState.showConfirm && (
+            <Button variant="gradient" color="green" type="submit">
+              <span>{modalContext.modalState.confirmText}</span>
+            </Button>
+          )}
         </DialogFooter>
       </form>
     </Dialog>

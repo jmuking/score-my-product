@@ -20,6 +20,7 @@ export default function Home() {
   const [modalState, setModalState] = useState(defaultModalState);
   const [userState, setUserState] = useState(defaultUserState);
   const [apiData, setApiData] = useState(defaultApiData);
+  const [apiLoading, setApiLoading] = useState(false);
 
   const startLogin = () => {
     setModalState({
@@ -42,7 +43,9 @@ export default function Home() {
   return (
     <div className="size-full">
       <UserContext.Provider value={{ userState, setUserState }}>
-        <ApiContext.Provider value={{ apiData, setApiData }}>
+        <ApiContext.Provider
+          value={{ apiData, setApiData, apiLoading, setApiLoading }}
+        >
           <ModalContext.Provider
             value={{ modalState, setModalState, startLogin }}
           >
