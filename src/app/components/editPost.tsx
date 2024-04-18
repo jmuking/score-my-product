@@ -1,7 +1,6 @@
 import { Input, Slider } from "@material-tailwind/react";
 import { useContext, useEffect } from "react";
 import { BaseSyntheticEvent } from "react";
-import { lookupProduct } from "../data";
 import { ModalContext } from "./modal";
 
 interface PostData {
@@ -29,13 +28,11 @@ export default function EditPost({ data, setData }: EditPostParams) {
         <>
           {modalContext.modalState?.inputData && (
             <>
-              <p>Country: {modalContext.modalState.inputData?.country.name}</p>
               <p>
-                Product:{" "}
-                {
-                  lookupProduct(modalContext.modalState.inputData?.product)
-                    ?.label
-                }
+                Country: {modalContext.modalState.inputData?.country.name_en}
+              </p>
+              <p>
+                Product: {modalContext.modalState.inputData?.product?.label}
               </p>
             </>
           )}
@@ -57,6 +54,7 @@ export default function EditPost({ data, setData }: EditPostParams) {
             onChange={(event: BaseSyntheticEvent) => {
               setData({ ...data, comment: event.target.value });
             }}
+            crossOrigin={undefined}
           />
         </>
       )}

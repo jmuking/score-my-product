@@ -1,20 +1,27 @@
 import React, { useState } from "react";
 import { Select, Option } from "@material-tailwind/react";
-import { Products } from "../data";
+import { lookupProduct, Products } from "../data";
 import { ApiContext, getScores } from "../api";
+import { Product } from "../types";
 
 export default function ProfileActions() {
   const apiContext = React.useContext(ApiContext);
 
-  const [activeProduct, setActiveProduct] = useState<string>();
+  const [activeProduct, setActiveProduct] = useState<Product>();
 
-  const productChanged = (product: string) => {
-    setActiveProduct(product);
-    apiContext.setApiData({ ...apiContext.apiData, product });
+  const productChanged = (productCode: string | undefined) => {
+    if (productCode) {
+      const product = lookupProduct(productCode);
 
-    getScores(product).then((value) => {
-      console.log(value.scores);
-    });
+      if (product) {
+        setActiveProduct(product);
+        apiContext.setApiData({ ...apiContext.apiData, product });
+
+        getScores(product).then((value) => {
+          console.log(value.scores);
+        });
+      }
+    }
   };
 
   return (
@@ -24,7 +31,7 @@ export default function ProfileActions() {
       </p>
       <Select
         label="Select Product"
-        value={activeProduct}
+        value={activeProduct?.code}
         onChange={productChanged}
       >
         {Products.map((product) => {

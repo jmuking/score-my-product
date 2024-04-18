@@ -79,7 +79,7 @@ export default function ProductMap() {
               if (user && product) {
                 createPost({
                   country: country?.wikidata_id,
-                  product,
+                  product: product?.code,
                   user,
                   score,
                   comment,

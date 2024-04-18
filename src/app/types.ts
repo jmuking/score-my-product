@@ -23,7 +23,7 @@ export interface UserState {
 }
 
 export interface ApiData {
-  product?: string;
+  product?: Product;
   posts?: any[];
   scores?: any[];
 }

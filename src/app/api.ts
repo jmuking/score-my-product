@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import React from "react";
 import { ApiData, Post, Product } from "./types";
 
@@ -32,7 +31,6 @@ const DEFAULT_DATA: any = {
 //POST requests
 export const createPost = async (post: Post) => {
   const body = { ...post, id: uuidv4() };
-  console.log(body);
 
   const response = await fetch(`${BASE_URL}/posts`, {
     ...DEFAULT_DATA,
@@ -54,8 +52,8 @@ export const getPosts = async (product: Product, country: string) => {
 };
 
 //SCORE requests
-export const getScores = async (product: string, country?: string) => {
-  const searchParams = new URLSearchParams({ product });
+export const getScores = async (product: Product, country?: string) => {
+  const searchParams = new URLSearchParams({ product: product.code });
   if (country) searchParams.append("country", country);
 
   const response = await fetch(

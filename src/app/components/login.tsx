@@ -12,6 +12,7 @@ export default function Login({ setData }: LoginParams) {
         onChange={(event: BaseSyntheticEvent) => {
           setData(event.target.value);
         }}
+        crossOrigin={undefined}
       />
     </div>
   );
