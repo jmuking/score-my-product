@@ -11,6 +11,7 @@ import { BaseSyntheticEvent } from "react";
 import { ApiContext, deletePost } from "../api";
 import { ModalType, Post } from "../types";
 import { defaultModalState, ModalContext } from "./modal";
+import { MapContext } from "./productMap";
 import { UserContext } from "./profile";
 
 interface PostData {
@@ -27,6 +28,7 @@ export default function EditPost({ data, setData }: EditPostParams) {
   const modalContext = useContext(ModalContext);
   const apiContext = useContext(ApiContext);
   const userContext = useContext(UserContext);
+  const mapContext = useContext(MapContext);
 
   const [editMode, setEditMode] = useState<boolean>(
     apiContext.apiData?.posts !== undefined &&
@@ -58,13 +60,18 @@ export default function EditPost({ data, setData }: EditPostParams) {
   };
 
   const _deletePost = () => {
+    const product = apiContext.apiData.product;
     modalContext.setModalState({
       ...defaultModalState,
       ...{
         open: true,
         modalType: ModalType.BASIC,
         confirmAction: () => {
-          deletePost(data as Post);
+          deletePost(data as Post).then(() => {
+            if (product) {
+              mapContext.reloadScores(product);
+            }
+          });
         },
       },
     });
@@ -84,7 +91,7 @@ export default function EditPost({ data, setData }: EditPostParams) {
                 <>
                   <p>
                     Country:{" "}
-                    {modalContext.modalState.inputData?.country.name_en}
+                    {modalContext.modalState.inputData?.country.COUNTRYAFF}
                   </p>
                   <p>
                     Product: {modalContext.modalState.inputData?.product?.label}

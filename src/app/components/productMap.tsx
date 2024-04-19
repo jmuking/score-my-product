@@ -6,25 +6,41 @@ import Map, {
   MapRef,
   MapboxGeoJSONFeature,
   MapLayerMouseEvent,
+  GeoJSONSource,
 } from "react-map-gl";
 import type { FillLayer } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Profile from "./profile";
-import { useContext, useRef, useState } from "react";
-import { ApiContext, createPost, editPost, getPosts } from "../api";
+import { useContext, useEffect, useRef, useState } from "react";
+import {
+  ApiContext,
+  createPost,
+  editPost,
+  getCountries,
+  getPosts,
+  getScores,
+} from "../api";
 import { ModalContext } from "./modal";
-import { MapState, ModalType } from "../types";
+import { MapState, ModalType, Product } from "../types";
 import { UserContext } from "./profile";
 import React from "react";
+import { features } from "process";
 
 const layerStyle: FillLayer = {
   id: "countries",
-  source: "country-boundaries",
-  "source-layer": "country_boundaries",
   type: "fill",
-  filter: ["==", ["get", "disputed"], "false"],
   paint: {
-    "fill-color": "rgba(66,100,251, 0.3)",
+    "fill-color": {
+      property: "score",
+      stops: [
+        [-1, "rgba(66,100,251, 0.3)"],
+        [0, "rgba(224,42,29, 0.3)"],
+        [25, "rgba(224,84,29, 0.3)"],
+        [50, "rgba(224,156,29, 0.3)"],
+        [75, "rgba(224,214,29, 0.3)"],
+        [100, "rgba(166,224,29, 0.3)"],
+      ],
+    },
     "fill-outline-color": "#0000ff",
     "fill-opacity": [
       "case",
@@ -35,12 +51,13 @@ const layerStyle: FillLayer = {
   },
 };
 
-const defaultMapState: MapState = {
+export const defaultMapState: MapState = {
   mapRef: null,
 };
 export const defaultMapContext = {
   mapState: defaultMapState,
   setMapState: (mapState: MapState) => {},
+  reloadScores: (product: Product) => {},
 };
 export const MapContext = React.createContext(defaultMapContext);
 
@@ -50,12 +67,27 @@ export default function ProductMap() {
   const apiContext = useContext(ApiContext);
   const modalContext = useContext(ModalContext);
   const userContext = useContext(UserContext);
+  const mapContext = useContext(MapContext);
 
-  const [mapState, setMapState] = useState(defaultMapState);
   const [hovered, setHovered] = useState<string | number | undefined>();
 
+  useEffect(() => {
+    getCountries().then((countries) => {
+      countries.features = countries.features.map((feature: any) => {
+        feature.properties = {
+          ...feature.properties,
+          ...{ ISO3: `0${feature.properties.ISO}` },
+        };
+
+        return feature;
+      });
+
+      apiContext.setApiData({ ...apiContext.apiData, ...{ countries } });
+    });
+  }, []);
+
   const mapRender = () => {
-    setMapState({ ...mapState, ...{ mapRef } });
+    mapContext.setMapState({ ...mapContext.mapState, ...{ mapRef } });
   };
 
   const canEdit = (features: MapboxGeoJSONFeature[] | undefined) => {
@@ -73,7 +105,7 @@ export default function ProductMap() {
 
       if (product) {
         apiContext.setApiLoading(true);
-        getPosts(product, country?.iso_3166_1_alpha_3).then((result) => {
+        getPosts(product, country?.ISO3).then((result) => {
           apiContext.setApiData({
             ...apiContext.apiData,
             ...{ posts: result.posts },
@@ -95,18 +127,23 @@ export default function ProductMap() {
 
               if (user && product) {
                 const payload = {
-                  country: country?.iso_3166_1_alpha_3,
+                  country: country?.ISO3,
                   product: product?.code,
                   user,
                   score,
                   comment,
                 };
 
+                let promise;
                 if (!id) {
-                  createPost(payload);
+                  promise = createPost(payload);
                 } else {
-                  editPost({ ...payload, ...{ id } });
+                  promise = editPost({ ...payload, ...{ id } });
                 }
+
+                promise.then(() => {
+                  mapContext.reloadScores(product);
+                });
               }
             },
           });
@@ -126,7 +163,6 @@ export default function ProductMap() {
         mapRef.current.setFeatureState(
           {
             source: "countries",
-            sourceLayer: "country_boundaries",
             id: hovered,
           },
           { hover: false }
@@ -137,7 +173,6 @@ export default function ProductMap() {
         mapRef.current.setFeatureState(
           {
             source: "countries",
-            sourceLayer: "country_boundaries",
             id: features[0].id,
           },
           { hover: true }
@@ -149,32 +184,26 @@ export default function ProductMap() {
   };
 
   return (
-    <MapContext.Provider value={{ mapState, setMapState }}>
-      <Map
-        ref={mapRef}
-        mapboxAccessToken={process.env.MAPBOX_API_KEY}
-        initialViewState={{
-          longitude: -98.5795,
-          latitude: 39.8283,
-          zoom: 2,
-        }}
-        mapStyle="mapbox://styles/mapbox/streets-v9"
-        interactiveLayerIds={["countries"]}
-        onClick={featureClick}
-        onMouseMove={mouseMove}
-        onRender={mapRender}
-      >
-        <Source
-          id="countries"
-          url="mapbox://mapbox.country-boundaries-v1"
-          type="vector"
-        >
-          <Layer {...layerStyle}></Layer>
-        </Source>
-        <GeolocateControl position="top-left" />
-        <NavigationControl position="top-left" />
-        <Profile />
-      </Map>
-    </MapContext.Provider>
+    <Map
+      ref={mapRef}
+      mapboxAccessToken={process.env.MAPBOX_API_KEY}
+      initialViewState={{
+        longitude: -98.5795,
+        latitude: 39.8283,
+        zoom: 2,
+      }}
+      mapStyle="mapbox://styles/mapbox/streets-v9"
+      interactiveLayerIds={["countries"]}
+      onClick={featureClick}
+      onMouseMove={mouseMove}
+      onRender={mapRender}
+    >
+      <Source id="countries" data={apiContext.apiData.countries} type="geojson">
+        <Layer {...layerStyle}></Layer>
+      </Source>
+      <GeolocateControl position="top-left" />
+      <NavigationControl position="top-left" />
+      <Profile />
+    </Map>
   );
 }

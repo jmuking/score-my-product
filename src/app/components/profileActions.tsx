@@ -4,6 +4,7 @@ import { lookupProduct, Products } from "../data";
 import { ApiContext, getScores } from "../api";
 import { Product } from "../types";
 import { MapContext } from "./productMap";
+import { GeoJSONSource } from "react-map-gl";
 
 export default function ProfileActions() {
   const apiContext = React.useContext(ApiContext);
@@ -23,13 +24,7 @@ export default function ProfileActions() {
         });
         apiContext.setApiLoading(true);
 
-        getScores(product).then((value) => {
-          apiContext.setApiData({
-            ...apiContext.apiData,
-            ...{ product, scores: value.scores },
-          });
-          apiContext.setApiLoading(false);
-        });
+        mapContext.reloadScores(product);
       }
     }
   };

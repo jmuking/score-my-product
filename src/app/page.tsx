@@ -1,17 +1,22 @@
 // page.js
 "use client";
 
-import React, { useState } from "react";
-import { ApiContext, defaultApiData } from "./api";
+import React, { useContext, useState } from "react";
+import { GeoJSONSource } from "react-map-gl";
+import { ApiContext, defaultApiData, getScores } from "./api";
 import Modal, { defaultModalState, ModalContext } from "./components/modal";
-import ProductMap from "./components/productMap";
+import ProductMap, {
+  defaultMapState,
+  MapContext,
+} from "./components/productMap";
 import { defaultUserState, UserContext } from "./components/profile";
-import { ModalType } from "./types";
+import { ModalType, Product } from "./types";
 
 export default function Home() {
   const [modalState, setModalState] = useState(defaultModalState);
   const [userState, setUserState] = useState(defaultUserState);
   const [apiData, setApiData] = useState(defaultApiData);
+  const [mapState, setMapState] = useState(defaultMapState);
   const [apiLoading, setApiLoading] = useState(false);
 
   const startLogin = () => {
@@ -32,18 +37,42 @@ export default function Home() {
     });
   };
 
+  const reloadScores = (product: Product) => {
+    getScores(product).then((value) => {
+      const countries = { ...apiData.countries };
+      countries.features.forEach((feature: any) => {
+        feature.properties.score =
+          feature.properties.ISO3 in value.scores
+            ? value.scores[feature.properties.ISO3]
+            : -1;
+      });
+
+      setApiData({
+        ...apiData,
+        ...{ countries, product, scores: value.scores },
+      });
+      (
+        mapState.mapRef?.current?.getSource("countries") as GeoJSONSource
+      ).setData(countries);
+
+      setApiLoading(false);
+    });
+  };
+
   return (
     <div className="size-full">
       <UserContext.Provider value={{ userState, setUserState }}>
         <ApiContext.Provider
           value={{ apiData, setApiData, apiLoading, setApiLoading }}
         >
-          <ModalContext.Provider
-            value={{ modalState, setModalState, startLogin }}
-          >
-            <ProductMap></ProductMap>
-            <Modal></Modal>
-          </ModalContext.Provider>
+          <MapContext.Provider value={{ mapState, setMapState, reloadScores }}>
+            <ModalContext.Provider
+              value={{ modalState, setModalState, startLogin }}
+            >
+              <ProductMap></ProductMap>
+              <Modal></Modal>
+            </ModalContext.Provider>
+          </MapContext.Provider>
         </ApiContext.Provider>
       </UserContext.Provider>
     </div>

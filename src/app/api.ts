@@ -1,7 +1,9 @@
 import React from "react";
 import { ApiData, Post, Product } from "./types";
 
-export const defaultApiData: ApiData = {};
+export const defaultApiData: ApiData = {
+  countries: undefined,
+};
 export const defaultApiContext = {
   apiLoading: false,
   setApiLoading: (loading: boolean) => {},
@@ -84,5 +86,14 @@ export const getScores = async (product: Product, country?: string) => {
     `${BASE_URL}/scores?` + searchParams,
     DEFAULT_DATA
   );
+  return response.json();
+};
+
+//COUNTRIES requests
+export const getCountries = async () => {
+  const response = await fetch(
+    "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Countries_(Generalized)/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&relationParam=&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&returnEnvelope=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&defaultSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token="
+  );
+
   return response.json();
 };

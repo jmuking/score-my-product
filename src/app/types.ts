@@ -31,6 +31,7 @@ export interface MapState {
 }
 
 export interface ApiData {
+  countries: any;
   product?: Product;
   posts?: any[];
   scores?: any[];
