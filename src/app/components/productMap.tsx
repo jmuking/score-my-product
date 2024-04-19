@@ -34,11 +34,11 @@ const layerStyle: FillLayer = {
       property: "score",
       stops: [
         [-1, "rgba(66,100,251, 0.3)"],
-        [0, "rgba(224,42,29, 0.3)"],
-        [25, "rgba(224,84,29, 0.3)"],
-        [50, "rgba(224,156,29, 0.3)"],
-        [75, "rgba(224,214,29, 0.3)"],
-        [100, "rgba(166,224,29, 0.3)"],
+        [0, "rgba(224,42,29, 0.7)"],
+        [25, "rgba(224,84,29, 0.7)"],
+        [50, "rgba(224,156,29, 0.7)"],
+        [75, "rgba(224,214,29, 0.7)"],
+        [100, "rgba(166,224,29, 0.7)"],
       ],
     },
     "fill-outline-color": "#0000ff",
@@ -76,7 +76,7 @@ export default function ProductMap() {
       countries.features = countries.features.map((feature: any) => {
         feature.properties = {
           ...feature.properties,
-          ...{ ISO3: `0${feature.properties.ISO}` },
+          ...{ ISO3: `0${feature.properties.ISO}`, score: -1 },
         };
 
         return feature;
