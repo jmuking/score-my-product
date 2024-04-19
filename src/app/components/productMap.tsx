@@ -6,7 +6,7 @@ import Map, {
   MapRef,
   MapboxGeoJSONFeature,
   MapLayerMouseEvent,
-  GeoJSONSource,
+  SymbolLayer,
 } from "react-map-gl";
 import type { FillLayer } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -24,7 +24,15 @@ import { ModalContext } from "./modal";
 import { MapState, ModalType, Product } from "../types";
 import { UserContext } from "./profile";
 import React from "react";
-import { features } from "process";
+
+const labelStyle: SymbolLayer = {
+  id: "countries-text",
+  type: "symbol",
+  layout: {
+    "text-field": ["format", ["get", "score"], { "font-scale": 0.8 }],
+  },
+  filter: [">=", "score", 0],
+};
 
 const layerStyle: FillLayer = {
   id: "countries",
@@ -199,6 +207,7 @@ export default function ProductMap() {
       onRender={mapRender}
     >
       <Source id="countries" data={apiContext.apiData.countries} type="geojson">
+        <Layer {...labelStyle}></Layer>
         <Layer {...layerStyle}></Layer>
       </Source>
       <GeolocateControl position="top-left" />
